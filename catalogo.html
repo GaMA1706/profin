@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colección Multimedia - Catálogo de Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <header class="bg-gray-800 p-4 shadow-lg flex justify-between items-center fixed top-0 w-full z-10">
+        <h1 class="text-3xl font-bold">CATALOGO DE PELICULAS Y ALBUM DE MUSICA</h1>
+        <div class="flex items-center space-x-4">
+<button type="submit">Buscar</button>
+            </button>
+            <a href="catalogo.html" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors">Volver al Catálogo</a>
+            <button id="logout-button" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition-colors">Cerrar Sesión</button>
+        </div>
+    </header>
+    <main class="container mx-auto p-4 pt-20">
+        <section id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></section>
+                <!-- Película 1 -->
+            <div class="movie-card" onclick="showBookingModal()">
+                <img src="diseno_sin_titulo_11-12.jpg" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Rapidos y Furiosos 9</h3>
+                    <div class="movie-meta">
+                        <span>Accion</span>
+                        <span>★ 5</span>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Película 2 -->
+            <div class="movie-card" onclick="showBookingModal()">
+                <img src="MC_SandstormSkinPack_NetBlogEditorial_565x565.jpg"  class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Minecraft</h3>
+                    <div class="movie-meta">
+                        <span>Aventura</span>
+                        <span>★ 5</span>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Película 3 -->
+            <div class="movie-card" onclick="showBookingModal()">
+                <img src="4fantastico.jpg" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Los 4 Fantasticos</h3>
+                    <div class="movie-meta">
+                        <span>Accion</span>
+                        <span>★ 4.0</span>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Película 4 -->
+            <div class="movie-card" onclick="showBookingModal()">
+                <img src="conjuro.png" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Conjuro 3</h3>
+                    <div class="movie-meta">
+                        <span>Terror</span>
+                        <span>★ 3.9</span>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- disco 1  -->
+            <div class="movie-card" onclick="showBookingModal()">
+                <img src="badbunny.png" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Un Verano Sin Ti ALBUM De Bad Bunny</h3>
+                    <div class="movie-meta">
+                        <span></span>
+                        <span>★ 4.8</span>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- disco 2 -->
+            <div class="movie-card" onclick="showBookingModal()">
+                <img src="karol.pgn.webp" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">TropiCoqueta ALBUM De Karol G</h3>
+                    <div class="movie-meta">
+                        <span></span>
+                        <span>★ 5</span>
+                    </div>
+                </div>
+            </div>
+
+        <div class="movie-card" onclick="showBookingModal()">
+            <img src="gera.png" class="movie-poster">
+            <div class="movie-info">
+                <h3 class="movie-title">Los No Tan Tristes ALBUM Gera,Charles y Nanpa</h3>
+                <div class="movie-meta">
+                    <span></span>
+                    <span>★ 5</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="movie-card" onclick="showBookingModal()">
+            <img src="tiago.png" class="movie-poster">
+            <div class="movie-info">
+                <h3 class="movie-title">Portales ALBUM Tiago pzk</h3>
+                <div class="movie-meta">
+                    <span></span>
+                    <span>★ 5</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
