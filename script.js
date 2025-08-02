@@ -3,18 +3,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onSnapshot, query, where, getDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 
-// === INICIALIZACIÓN DE FIREBASE ===
-// Esta es la parte crucial. Asegúrate de que esta configuración
-// sea la primera que se ejecute en tu script.
+// === INICIALIZACIÓN DE FIREBASE CON LAS NUEVAS CREDENCIALES ===
 const firebaseConfig = {
-    apiKey: "AIzaSyCJ__y3irk8qr7DQMzOdXwveTLXPNmtWw",
-    authDomain: "cd-y-dvd.firebaseapp.com",
-    databaseURL: "https://cd-y-dvd-default-rtdb.firebaseio.com",
-    projectId: "cd-y-dvd",
-    storageBucket: "cd-y-dvd.firebasestorage.app",
-    messagingSenderId: "355559044908",
-    appId: "1:355559044908:web:813472eda219925ee59e89",
-    measurementId: "G-SY6Z7CB1C5"
+    apiKey: "AIzaSyD8WzxzffnSQ7BoCKwxPC6mEC4abFy6FWM",
+    authDomain: "mi-coleccion-8fa8e.firebaseapp.com",
+    projectId: "mi-coleccion-8fa8e",
+    storageBucket: "mi-coleccion-8fa8e.firebasestorage.app",
+    messagingSenderId: "868401315977",
+    appId: "1:868401315977:web:17c1830818fc478c864658",
+    measurementId: "G-7R45NY1MPS"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -22,7 +19,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // === VARIABLES DEL DOM ===
-// Se mantienen sin cambios
 const registerForm = document.getElementById('register-form');
 const loginForm = document.getElementById('login-form');
 const logoutButton = document.getElementById('logout-button');
