@@ -1,3 +1,26 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCJ__y3irk8qr7DQMzOdX8wveTLXPNmtWw",
+  authDomain: "cd-y-dvd.firebaseapp.com",
+  databaseURL: "https://cd-y-dvd-default-rtdb.firebaseio.com",
+  projectId: "cd-y-dvd",
+  storageBucket: "cd-y-dvd.firebasestorage.app",
+  messagingSenderId: "355559044908",
+  appId: "1:355559044908:web:813472eda219925ee59e89",
+  measurementId: "G-SY6Z7CB1C5"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
 // Importa las funciones necesarias de los SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
@@ -359,4 +382,5 @@ async function loadCartItems() {
         });
     }
 }
+
 
