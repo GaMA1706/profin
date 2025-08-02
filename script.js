@@ -27,15 +27,16 @@ import {
 
 // Tu configuración de Firebase
 const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "cd-y-dvd-6f1d8.firebaseapp.com",
-    databaseURL: "https://cd-y-dvd-6f1d8-default-rtdb.firebaseio.com",
-    projectId: "cd-y-dvd-6f1d8",
-    storageBucket: "cd-y-dvd-6f1d8.firebasestorage.app",
-    messagingSenderId: "845069801378",
-    appId: "1:845069801378:web:e42b093e7dea50ffd3c4fb",
-    measurementId: "G-T0V1KJCCJ3"
+  apiKey: "AIzaSyDQFGkyyXoWoGAN0YGStLv-OacuCZHCaJ4",
+  authDomain: "cd-y-dvd-6f1d8.firebaseapp.com",
+  databaseURL: "https://cd-y-dvd-6f1d8-default-rtdb.firebaseio.com",
+  projectId: "cd-y-dvd-6f1d8",
+  storageBucket: "cd-y-dvd-6f1d8.firebasestorage.app",
+  messagingSenderId: "845069801378",
+  appId: "1:845069801378:web:e42b093e7dea50ffd3c4fb",
+  measurementId: "G-T0V1KJCCJ3"
 };
+
 
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
@@ -249,3 +250,4 @@ async function loadProducts() {
         });
     });
 }
+
