@@ -3,9 +3,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onSnapshot, query, where, getDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 
-// Tu configuración de Firebase para el proyecto 'cd-y-dvd'
+// === INICIALIZACIÓN DE FIREBASE ===
+// Esta es la parte crucial. Asegúrate de que esta configuración
+// sea la primera que se ejecute en tu script.
 const firebaseConfig = {
-    apiKey: "AIzaSyCJ__y3irk8qr7DQMzOdX8wveTLXPNmtWw",
+    apiKey: "AIzaSyCJ__y3irk8qr7DQMzOdXwveTLXPNmtWw",
     authDomain: "cd-y-dvd.firebaseapp.com",
     databaseURL: "https://cd-y-dvd-default-rtdb.firebaseio.com",
     projectId: "cd-y-dvd",
@@ -15,12 +17,12 @@ const firebaseConfig = {
     measurementId: "G-SY6Z7CB1C5"
 };
 
-// Inicializa Firebase una sola vez
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Variables de elementos del DOM
+// === VARIABLES DEL DOM ===
+// Se mantienen sin cambios
 const registerForm = document.getElementById('register-form');
 const loginForm = document.getElementById('login-form');
 const logoutButton = document.getElementById('logout-button');
@@ -38,14 +40,13 @@ const cartCountElement = document.getElementById('cart-count');
 const checkoutButton = document.getElementById('checkout-button');
 
 // --- Lógica de Autenticación y Redirección ---
-
-// onAuthStateChanged escucha los cambios de estado de autenticación (login, logout)
 onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
+    const isIndexPage = currentPath.includes('index.html') || currentPath === '/';
 
     if (user) {
         // Usuario autenticado
-        if (currentPath.includes('index.html') || currentPath === '/') {
+        if (isIndexPage) {
             if (user.email.endsWith('@admin.com')) {
                 window.location.href = 'admin.html';
             } else {
@@ -53,7 +54,6 @@ onAuthStateChanged(auth, (user) => {
             }
         }
         
-        // Cargar los datos de la página actual
         if (currentPath.includes('catalogo.html')) {
             loadProducts();
             loadCart();
@@ -65,7 +65,7 @@ onAuthStateChanged(auth, (user) => {
         
     } else {
         // Usuario no autenticado
-        if (!currentPath.includes('index.html') && currentPath !== '/') {
+        if (!isIndexPage) {
             window.location.href = 'index.html';
         }
     }
@@ -78,11 +78,9 @@ if (registerForm) {
         const email = registerForm['register-email'].value;
         const password = registerForm['register-password'].value;
         try {
-            // 1. Crear el usuario en Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
-            // 2. Guardar la información del usuario en Firestore
             await addDoc(collection(db, 'users'), {
                 uid: user.uid,
                 email: user.email,
@@ -90,7 +88,6 @@ if (registerForm) {
             });
 
             console.log("Registro exitoso, redirigiendo...");
-            // onAuthStateChanged se activará y hará la redirección
         } catch (error) {
             alert(error.message);
         }
@@ -106,7 +103,6 @@ if (loginForm) {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             console.log("Inicio de sesión exitoso, redirigiendo...");
-            // onAuthStateChanged se activará y hará la redirección
         } catch (error) {
             alert(error.message);
         }
@@ -142,8 +138,7 @@ if (showRegisterLink) {
     });
 }
 
-// --- Lógica del panel de administración y catálogo (sin cambios) ---
-
+// --- Lógica de la aplicación (Admin, Catálogo, Carrito) ---
 if (productForm) {
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -232,8 +227,6 @@ async function deleteProduct(id) {
     }
 }
 
-
-// Lógica del catálogo de productos para clientes
 async function loadProducts() {
     if (!productCatalogue) return;
     const productsRef = collection(db, 'products');
@@ -266,7 +259,6 @@ async function loadProducts() {
     });
 }
 
-// Lógica del carrito de compras
 async function addToCart(productId) {
     const user = auth.currentUser;
     if (!user) {
@@ -306,7 +298,6 @@ async function addToCart(productId) {
         });
     }
 
-    // Actualizar stock
     await updateDoc(doc(db, 'products', productId), {
         stock: productData.stock - 1
     });
