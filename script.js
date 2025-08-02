@@ -1,26 +1,47 @@
-$ npm install firebase
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// script.js
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Importa las funciones necesarias desde los SDKs de Firebase.
+// Asegúrate de usar la versión correcta de los SDKs.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    getDocs, 
+    doc, 
+    updateDoc, 
+    deleteDoc, 
+    query, 
+    where, 
+    onSnapshot, 
+    getDoc 
+} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+// Tu configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDQFGkyyXoWoGAN0YGStLv-OacuCZHCaJ4",
-  authDomain: "cd-y-dvd-6f1d8.firebaseapp.com",
-  databaseURL: "https://cd-y-dvd-6f1d8-default-rtdb.firebaseio.com",
-  projectId: "cd-y-dvd-6f1d8",
-  storageBucket: "cd-y-dvd-6f1d8.firebasestorage.app",
-  messagingSenderId: "845069801378",
-  appId: "1:845069801378:web:e42b093e7dea50ffd3c4fb",
-  measurementId: "G-T0V1KJCCJ3"
+    apiKey: "TU_API_KEY",
+    authDomain: "cd-y-dvd-6f1d8.firebaseapp.com",
+    databaseURL: "https://cd-y-dvd-6f1d8-default-rtdb.firebaseio.com",
+    projectId: "cd-y-dvd-6f1d8",
+    storageBucket: "cd-y-dvd-6f1d8.firebasestorage.app",
+    messagingSenderId: "845069801378",
+    appId: "1:845069801378:web:e42b093e7dea50ffd3c4fb",
+    measurementId: "G-T0V1KJCCJ3"
 };
 
-// Initialize Firebase
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Variables de elementos del DOM
 const registerForm = document.getElementById('register-form');
@@ -33,44 +54,53 @@ const loginContainer = document.getElementById('login-container');
 const productForm = document.getElementById('productForm');
 const productList = document.getElementById('productList');
 const productCatalogue = document.getElementById('product-list');
-const cartButton = document.getElementById('cart-button');
-const cartItemsContainer = document.getElementById('cart-items');
-const cartTotalElement = document.getElementById('cart-total');
-const cartCountElement = document.getElementById('cart-count');
-const checkoutButton = document.getElementById('checkout-button');
 
-// Lógica de autenticación y redirección
-onAuthStateChanged(auth, async (user) => {
-    const currentPath = window.location.pathname;
+// --- Lógica de Autenticación y Redirección ---
+onAuthStateChanged(auth, (user) => {
+    const currentPath = window.location.pathname.split('/').pop();
 
     if (user) {
         // Usuario autenticado
-        if (currentPath.includes('index.html') || currentPath === '/') {
+        if (currentPath === 'index.html' || currentPath === '') {
+            // Redirige según el tipo de usuario si están en la página de inicio
             if (user.email.endsWith('@admin.com')) {
-                window.location.href = 'admin.html';
+                window.location.href = 'administrador.html';
             } else {
                 window.location.href = 'catalogo.html';
             }
+        } else {
+            // El usuario ya está en una página del sistema, carga la funcionalidad correspondiente
+            if (currentPath === 'catalogo.html') {
+                loadProducts();
+            } else if (currentPath === 'administrador.html') {
+                loadAdminProducts();
+            }
         }
-        
-        // Lógica para catálogos y admin
-        if (currentPath.includes('catalogo.html')) {
-            loadProducts();
-            loadCart();
-        } else if (currentPath.includes('admin.html')) {
-            loadAdminProducts();
-        } else if (currentPath.includes('carrito.html')) {
-            loadCartItems();
-        }
-        
     } else {
         // Usuario no autenticado
-        if (!currentPath.includes('index.html') && currentPath !== '/') {
+        if (currentPath !== 'index.html' && currentPath !== '') {
+            // Si no está en la página de inicio, redirige al inicio
             window.location.href = 'index.html';
         }
     }
 });
 
+// --- Lógica para alternar formularios de registro/inicio de sesión ---
+if (showLoginLink && showRegisterLink) {
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerContainer.classList.add('hidden');
+        loginContainer.classList.remove('hidden');
+    });
+
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginContainer.classList.add('hidden');
+        registerContainer.classList.remove('hidden');
+    });
+}
+
+// --- Eventos de formularios y botones ---
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -94,7 +124,7 @@ if (loginForm) {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Inicio de sesión exitoso!");
         } catch (error) {
-            alert(error.message);
+            alert("Error al iniciar sesión: " + error.message);
         }
     });
 }
@@ -106,36 +136,19 @@ if (logoutButton) {
     });
 }
 
-// Lógica para alternar formularios de registro/inicio de sesión
-if (showLoginLink) {
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerContainer.classList.add('hidden');
-        loginContainer.classList.remove('hidden');
-    });
-}
-
-if (showRegisterLink) {
-    showRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginContainer.classList.add('hidden');
-        registerContainer.classList.remove('hidden');
-    });
-}
-
-// Lógica del panel de administración
+// --- Lógica del panel de administración (Agregar, Editar, Eliminar) ---
 if (productForm) {
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const productId = productForm['productId'].value;
         const product = {
+            // Corregido el nombre de las variables
             name: productForm['productName'].value,
             description: productForm['productDescription'].value,
-            price: parseFloat(productForm['productPrice'].value),
-            stock: parseInt(productForm['productStock'].value),
             category: productForm['productCategory'].value,
             imageURL: productForm['productImageURL'].value,
-            createdAt: new Date()
+            calificacion: parseFloat(productForm['productPrice'].value), // Cambiado 'price' a 'calificacion'
+            ubicacion: parseInt(productForm['productStock'].value),      // Cambiado 'stock' a 'ubicacion'
         };
 
         try {
@@ -147,7 +160,7 @@ if (productForm) {
                 alert("Producto añadido con éxito!");
             }
             productForm.reset();
-            loadAdminProducts(); // Recarga la lista de productos
+            loadAdminProducts();
         } catch (error) {
             alert("Error al guardar el producto: " + error.message);
         }
@@ -158,9 +171,7 @@ async function loadAdminProducts() {
     if (!productList) return;
     productList.innerHTML = '';
     const productsRef = collection(db, 'products');
-    const q = query(productsRef);
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(productsRef, (snapshot) => {
         productList.innerHTML = '';
         snapshot.forEach((doc) => {
             const product = { ...doc.data(), id: doc.id };
@@ -170,8 +181,8 @@ async function loadAdminProducts() {
                 <div>
                     <h3 class="text-xl font-bold">${product.name}</h3>
                     <p class="text-gray-400">${product.description}</p>
-                    <p class="text-lg font-semibold text-purple-400">$${product.price.toFixed(2)}</p>
-                    <p>Stock: ${product.stock}</p>
+                    <p class="text-lg font-semibold text-purple-400">Calificación: ${product.calificacion}</p>
+                    <p>Ubicación: ${product.ubicacion}</p>
                 </div>
                 <div class="space-x-2">
                     <button class="edit-button px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors" data-id="${product.id}">Editar</button>
@@ -181,7 +192,6 @@ async function loadAdminProducts() {
             productList.appendChild(productElement);
         });
 
-        // Eventos para editar y eliminar
         productList.querySelectorAll('.edit-button').forEach(button => {
             button.addEventListener('click', (e) => editProduct(e.target.dataset.id));
         });
@@ -199,8 +209,8 @@ async function editProduct(id) {
         productForm['productId'].value = id;
         productForm['productName'].value = product.name;
         productForm['productDescription'].value = product.description;
-        productForm['productPrice'].value = product.price;
-        productForm['productStock'].value = product.stock;
+        productForm['productPrice'].value = product.calificacion;
+        productForm['productStock'].value = product.ubicacion;
         productForm['productCategory'].value = product.category;
         productForm['productImageURL'].value = product.imageURL;
         window.scrollTo(0, 0);
@@ -210,17 +220,15 @@ async function editProduct(id) {
 async function deleteProduct(id) {
     if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
         await deleteDoc(doc(db, 'products', id));
+        alert("Producto eliminado con éxito.");
     }
 }
 
-
-// Lógica del catálogo de productos para clientes
+// --- Lógica del Catálogo de Productos ---
 async function loadProducts() {
     if (!productCatalogue) return;
     const productsRef = collection(db, 'products');
-    const q = query(productsRef, where('stock', '>', 0));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(productsRef, (snapshot) => {
         productCatalogue.innerHTML = '';
         snapshot.forEach((doc) => {
             const product = { ...doc.data(), id: doc.id };
@@ -233,134 +241,11 @@ async function loadProducts() {
                     <p class="text-gray-400 mb-4">${product.description}</p>
                 </div>
                 <div class="mt-4">
-                    <p class="text-3xl font-bold text-purple-400 mb-4">$${product.price.toFixed(2)}</p>
-                    <p class="text-sm text-gray-500">Stock: ${product.stock}</p>
-                    <button class="add-to-cart-button w-full px-4 py-2 mt-4 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors" data-id="${product.id}">Añadir al Carrito</button>
+                    <p class="text-3xl font-bold text-purple-400 mb-4">Calificación: ${product.calificacion}</p>
+                    <p class="text-sm text-gray-500">Ubicación: ${product.ubicacion}</p>
                 </div>
             `;
             productCatalogue.appendChild(productCard);
         });
-
-        productCatalogue.querySelectorAll('.add-to-cart-button').forEach(button => {
-            button.addEventListener('click', (e) => addToCart(e.target.dataset.id));
-        });
     });
 }
-
-// Lógica del carrito de compras
-async function addToCart(productId) {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Debes iniciar sesión para añadir productos al carrito.");
-        return;
-    }
-    
-    const cartRef = collection(db, 'carts');
-    const cartItemRef = doc(cartRef, `${user.uid}_${productId}`);
-
-    const productDoc = await getDoc(doc(db, 'products', productId));
-    if (!productDoc.exists()) {
-        alert("Producto no encontrado.");
-        return;
-    }
-    
-    const productData = productDoc.data();
-    if (productData.stock <= 0) {
-        alert("Lo sentimos, este producto está agotado.");
-        return;
-    }
-
-    const cartDoc = await getDoc(cartItemRef);
-    if (cartDoc.exists()) {
-        await updateDoc(cartItemRef, {
-            quantity: cartDoc.data().quantity + 1
-        });
-    } else {
-        await addDoc(cartRef, {
-            userId: user.uid,
-            productId: productId,
-            name: productData.name,
-            price: productData.price,
-            imageURL: productData.imageURL,
-            quantity: 1
-        });
-    }
-
-    // Actualizar stock
-    await updateDoc(doc(db, 'products', productId), {
-        stock: productData.stock - 1
-    });
-}
-
-function loadCart() {
-    const user = auth.currentUser;
-    if (!user || !cartCountElement) return;
-
-    const cartRef = collection(db, 'carts');
-    const q = query(cartRef, where('userId', '==', user.uid));
-
-    onSnapshot(q, (snapshot) => {
-        let totalItems = 0;
-        snapshot.forEach(doc => {
-            totalItems += doc.data().quantity;
-        });
-        cartCountElement.textContent = totalItems;
-    });
-    
-    if (cartButton) {
-        cartButton.addEventListener('click', () => {
-            window.location.href = 'carrito.html';
-        });
-    }
-}
-
-async function loadCartItems() {
-    const user = auth.currentUser;
-    if (!user || !cartItemsContainer) return;
-    
-    const cartRef = collection(db, 'carts');
-    const q = query(cartRef, where('userId', '==', user.uid));
-
-    onSnapshot(q, (snapshot) => {
-        cartItemsContainer.innerHTML = '';
-        let total = 0;
-        snapshot.forEach(doc => {
-            const item = { ...doc.data(), id: doc.id };
-            total += item.price * item.quantity;
-            const cartItemElement = document.createElement('div');
-            cartItemElement.className = 'flex items-center justify-between p-4 bg-gray-700 rounded-lg';
-            cartItemElement.innerHTML = `
-                <div class="flex items-center space-x-4">
-                    <img src="${item.imageURL || 'https://via.placeholder.com/100'}" alt="${item.name}" class="w-16 h-16 rounded-lg">
-                    <div>
-                        <h3 class="text-xl font-bold">${item.name}</h3>
-                        <p class="text-gray-400">$${item.price.toFixed(2)} x ${item.quantity}</p>
-                    </div>
-                </div>
-                <div class="text-xl font-bold">$${(item.price * item.quantity).toFixed(2)}</div>
-            `;
-            cartItemsContainer.appendChild(cartItemElement);
-        });
-        cartTotalElement.textContent = total.toFixed(2);
-    });
-
-    if (checkoutButton) {
-        checkoutButton.addEventListener('click', () => {
-            alert("Compra finalizada con éxito! (Esta es una función simulada)");
-            // Aquí iría la lógica real para procesar el pago y vaciar el carrito
-            // Por ahora, solo vaciamos el carrito simuladamente
-            const user = auth.currentUser;
-            if (user) {
-                const cartRef = collection(db, 'carts');
-                const q = query(cartRef, where('userId', '==', user.uid));
-                getDocs(q).then(snapshot => {
-                    snapshot.forEach(doc => {
-                        deleteDoc(doc.ref);
-                    });
-                });
-            }
-            window.location.href = 'catalogo.html';
-        });
-    }
-}
-
