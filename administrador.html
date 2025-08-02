@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colección Multimedia - Panel de Administración</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <header class="bg-gray-800 p-4 shadow-lg flex justify-between items-center fixed top-0 w-full z-10">
+        <h1 class="text-3xl font-bold">Panel de Administración</h1>
+        <button id="logout-button" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition-colors">Cerrar Sesión</button>
+    </header>
+
+    <main class="container mx-auto p-4 pt-20">
+        <section class="bg-gray-800 p-6 rounded-lg shadow-xl mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 neon-text">Añadir/Editar Producto</h2>
+            <form id="productForm" class="space-y-4">
+                <input type="hidden" id="productId">
+                <input type="text" id="productName" placeholder="Título del CD o DVD" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <textarea id="productDescription" placeholder="Descripción (Artista, Género, Año, etc.)" rows="3" required
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                <input type="text" id="productCategory" placeholder="Categoría (ej: Rock, Pop, Aventura, Ciencia Ficción)" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <input type="url" id="productImageURL" placeholder="URL de la Imagen de la Portada (opcional)"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                       <input type="number" id="productPrice" placeholder="Calificacion" step="0.01" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <input type="number" id="productStock" placeholder="Ubicacion" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <button type="submit" id="save-product-button"
+                        class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors">
+                    Guardar Producto
+                </button>
+            </form>
+        </section>
+
+        <section class="bg-gray-800 p-6 rounded-lg shadow-xl">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 neon-text">Inventario de Productos</h2>
+            <div id="productList" class="space-y-4">
+                </div>
+        </section>
+    </main>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
