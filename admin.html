@@ -10,7 +10,6 @@
 <body class="bg-gray-900 text-gray-100">
     <header class="bg-gray-800 p-4 shadow-lg flex justify-between items-center fixed top-0 w-full z-10">
         <h1 class="text-3xl font-bold">Panel de Administración</h1>
-        <a href="catalogo.html" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors">Volver al Catálogo</a>
         <button id="logout-button" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition-colors">Cerrar Sesión</button>
     </header>
 
@@ -20,17 +19,17 @@
             <form id="productForm" class="space-y-4">
                 <input type="hidden" id="productId">
                 <input type="text" id="productName" placeholder="Título del CD o DVD" required
-                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <textarea id="productDescription" placeholder="Descripción (Artista, Género, Año, etc.)" rows="3" required
-                          class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
                 <input type="text" id="productCategory" placeholder="Categoría (ej: Rock, Pop, Aventura, Ciencia Ficción)" required
-                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <input type="url" id="productImageURL" placeholder="URL de la Imagen de la Portada (opcional)"
-                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <input type="number" id="productPrice" placeholder="Calificacion" step="0.1" required
-                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                       <input type="number" id="productPrice" placeholder="Calificacion" step="0.01" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <input type="number" id="productStock" placeholder="Ubicacion" required
-                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <button type="submit" id="save-product-button"
                         class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition-colors">
                     Guardar Producto
