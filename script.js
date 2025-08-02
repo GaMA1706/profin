@@ -1,24 +1,27 @@
-// Importa las funciones necesarias de los SDKs de Firebase para el navegador
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onSnapshot, query, where, getDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-// === INICIALIZACIÓN DE FIREBASE CON LAS NUEVAS CREDENCIALES ===
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyD8WzxzffnSQ7BoCKwxPC6mEC4abFy6FWM",
-    authDomain: "mi-coleccion-8fa8e.firebaseapp.com",
-    projectId: "mi-coleccion-8fa8e",
-    storageBucket: "mi-coleccion-8fa8e.firebasestorage.app",
-    messagingSenderId: "868401315977",
-    appId: "1:868401315977:web:17c1830818fc478c864658",
-    measurementId: "G-7R45NY1MPS"
+  apiKey: "AIzaSyDQFGkyyXoWoGAN0YGStLv-OacuCZHCaJ4",
+  authDomain: "cd-y-dvd-6f1d8.firebaseapp.com",
+  databaseURL: "https://cd-y-dvd-6f1d8-default-rtdb.firebaseio.com",
+  projectId: "cd-y-dvd-6f1d8",
+  storageBucket: "cd-y-dvd-6f1d8.firebasestorage.app",
+  messagingSenderId: "845069801378",
+  appId: "1:845069801378:web:e42b093e7dea50ffd3c4fb",
+  measurementId: "G-T0V1KJCCJ3"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const analytics = getAnalytics(app);
 
-// === VARIABLES DEL DOM ===
+// Variables de elementos del DOM
 const registerForm = document.getElementById('register-form');
 const loginForm = document.getElementById('login-form');
 const logoutButton = document.getElementById('logout-button');
@@ -35,14 +38,13 @@ const cartTotalElement = document.getElementById('cart-total');
 const cartCountElement = document.getElementById('cart-count');
 const checkoutButton = document.getElementById('checkout-button');
 
-// --- Lógica de Autenticación y Redirección ---
-onAuthStateChanged(auth, (user) => {
+// Lógica de autenticación y redirección
+onAuthStateChanged(auth, async (user) => {
     const currentPath = window.location.pathname;
-    const isIndexPage = currentPath.includes('index.html') || currentPath === '/';
 
     if (user) {
         // Usuario autenticado
-        if (isIndexPage) {
+        if (currentPath.includes('index.html') || currentPath === '/') {
             if (user.email.endsWith('@admin.com')) {
                 window.location.href = 'admin.html';
             } else {
@@ -50,6 +52,7 @@ onAuthStateChanged(auth, (user) => {
             }
         }
         
+        // Lógica para catálogos y admin
         if (currentPath.includes('catalogo.html')) {
             loadProducts();
             loadCart();
@@ -61,36 +64,26 @@ onAuthStateChanged(auth, (user) => {
         
     } else {
         // Usuario no autenticado
-        if (!isIndexPage) {
+        if (!currentPath.includes('index.html') && currentPath !== '/') {
             window.location.href = 'index.html';
         }
     }
 });
 
-// Registro de usuario
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = registerForm['register-email'].value;
         const password = registerForm['register-password'].value;
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            
-            await addDoc(collection(db, 'users'), {
-                uid: user.uid,
-                email: user.email,
-                createdAt: new Date(),
-            });
-
-            console.log("Registro exitoso, redirigiendo...");
+            await createUserWithEmailAndPassword(auth, email, password);
+            alert("Registro exitoso!");
         } catch (error) {
             alert(error.message);
         }
     });
 }
 
-// Inicio de sesión de usuario
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -98,18 +91,17 @@ if (loginForm) {
         const password = loginForm['login-password'].value;
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            console.log("Inicio de sesión exitoso, redirigiendo...");
+            alert("Inicio de sesión exitoso!");
         } catch (error) {
             alert(error.message);
         }
     });
 }
 
-// Cerrar sesión
 if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
         await signOut(auth);
-        console.log("Sesión cerrada, redirigiendo a index.html");
+        window.location.href = 'index.html';
     });
 }
 
@@ -117,24 +109,20 @@ if (logoutButton) {
 if (showLoginLink) {
     showLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
-        if (registerContainer && loginContainer) {
-            registerContainer.classList.add('hidden');
-            loginContainer.classList.remove('hidden');
-        }
+        registerContainer.classList.add('hidden');
+        loginContainer.classList.remove('hidden');
     });
 }
 
 if (showRegisterLink) {
     showRegisterLink.addEventListener('click', (e) => {
         e.preventDefault();
-        if (loginContainer && registerContainer) {
-            loginContainer.classList.add('hidden');
-            registerContainer.classList.remove('hidden');
-        }
+        loginContainer.classList.add('hidden');
+        registerContainer.classList.remove('hidden');
     });
 }
 
-// --- Lógica de la aplicación (Admin, Catálogo, Carrito) ---
+// Lógica del panel de administración
 if (productForm) {
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -158,7 +146,7 @@ if (productForm) {
                 alert("Producto añadido con éxito!");
             }
             productForm.reset();
-            loadAdminProducts();
+            loadAdminProducts(); // Recarga la lista de productos
         } catch (error) {
             alert("Error al guardar el producto: " + error.message);
         }
@@ -171,7 +159,7 @@ async function loadAdminProducts() {
     const productsRef = collection(db, 'products');
     const q = query(productsRef);
 
-    onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
         productList.innerHTML = '';
         snapshot.forEach((doc) => {
             const product = { ...doc.data(), id: doc.id };
@@ -192,6 +180,7 @@ async function loadAdminProducts() {
             productList.appendChild(productElement);
         });
 
+        // Eventos para editar y eliminar
         productList.querySelectorAll('.edit-button').forEach(button => {
             button.addEventListener('click', (e) => editProduct(e.target.dataset.id));
         });
@@ -223,12 +212,14 @@ async function deleteProduct(id) {
     }
 }
 
+
+// Lógica del catálogo de productos para clientes
 async function loadProducts() {
     if (!productCatalogue) return;
     const productsRef = collection(db, 'products');
     const q = query(productsRef, where('stock', '>', 0));
 
-    onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
         productCatalogue.innerHTML = '';
         snapshot.forEach((doc) => {
             const product = { ...doc.data(), id: doc.id };
@@ -255,6 +246,7 @@ async function loadProducts() {
     });
 }
 
+// Lógica del carrito de compras
 async function addToCart(productId) {
     const user = auth.currentUser;
     if (!user) {
@@ -263,6 +255,8 @@ async function addToCart(productId) {
     }
     
     const cartRef = collection(db, 'carts');
+    const cartItemRef = doc(cartRef, `${user.uid}_${productId}`);
+
     const productDoc = await getDoc(doc(db, 'products', productId));
     if (!productDoc.exists()) {
         alert("Producto no encontrado.");
@@ -275,13 +269,10 @@ async function addToCart(productId) {
         return;
     }
 
-    const cartQuery = query(cartRef, where('userId', '==', user.uid), where('productId', '==', productId));
-    const cartSnapshot = await getDocs(cartQuery);
-
-    if (!cartSnapshot.empty) {
-        const cartItemDoc = cartSnapshot.docs[0];
-        await updateDoc(doc(db, 'carts', cartItemDoc.id), {
-            quantity: cartItemDoc.data().quantity + 1
+    const cartDoc = await getDoc(cartItemRef);
+    if (cartDoc.exists()) {
+        await updateDoc(cartItemRef, {
+            quantity: cartDoc.data().quantity + 1
         });
     } else {
         await addDoc(cartRef, {
@@ -294,6 +285,7 @@ async function addToCart(productId) {
         });
     }
 
+    // Actualizar stock
     await updateDoc(doc(db, 'products', productId), {
         stock: productData.stock - 1
     });
@@ -354,6 +346,8 @@ async function loadCartItems() {
     if (checkoutButton) {
         checkoutButton.addEventListener('click', () => {
             alert("Compra finalizada con éxito! (Esta es una función simulada)");
+            // Aquí iría la lógica real para procesar el pago y vaciar el carrito
+            // Por ahora, solo vaciamos el carrito simuladamente
             const user = auth.currentUser;
             if (user) {
                 const cartRef = collection(db, 'carts');
