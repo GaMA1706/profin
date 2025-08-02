@@ -1,4 +1,4 @@
-                // Importa las funciones necesarias de los SDKs de Firebase para el navegador
+// Importa las funciones necesarias de los SDKs de Firebase para el navegador
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onSnapshot, query, where, getDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
@@ -12,7 +12,6 @@ const firebaseConfig = {
     storageBucket: "cd-y-dvd.firebasestorage.app",
     messagingSenderId: "355559044908",
     appId: "1:355559044908:web:813472eda219925ee59e89",
-    // El measurementId es opcional si no usas Google Analytics
     measurementId: "G-SY6Z7CB1C5"
 };
 
@@ -38,13 +37,16 @@ const cartTotalElement = document.getElementById('cart-total');
 const cartCountElement = document.getElementById('cart-count');
 const checkoutButton = document.getElementById('checkout-button');
 
-// Lógica de autenticación y redirección
-onAuthStateChanged(auth, async (user) => {
+// --- Lógica de Autenticación y Redirección ---
+// onAuthStateChanged es la mejor manera de manejar las redirecciones, ya que se activa automáticamente
+// cuando el estado de autenticación cambia (login, logout, o recarga de página con sesión activa).
+onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
 
     if (user) {
         // Usuario autenticado
         if (currentPath.includes('index.html') || currentPath === '/') {
+            // Si el usuario está en la página de inicio, redirigirlo a la página correcta.
             if (user.email.endsWith('@admin.com')) {
                 window.location.href = 'admin.html';
             } else {
@@ -52,6 +54,7 @@ onAuthStateChanged(auth, async (user) => {
             }
         }
         
+        // Cargar los datos específicos de cada página si el usuario está autenticado
         if (currentPath.includes('catalogo.html')) {
             loadProducts();
             loadCart();
@@ -63,63 +66,80 @@ onAuthStateChanged(auth, async (user) => {
         
     } else {
         // Usuario no autenticado
+        // Si el usuario está en una página protegida (no la de inicio), lo redirige a index.html.
         if (!currentPath.includes('index.html') && currentPath !== '/') {
             window.location.href = 'index.html';
         }
     }
 });
 
+// --- Manejadores de eventos de los formularios y botones ---
+
+// Registro de usuario
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = registerForm['register-email'].value;
         const password = registerForm['register-password'].value;
         try {
+            // La redirección ocurrirá automáticamente gracias a onAuthStateChanged
             await createUserWithEmailAndPassword(auth, email, password);
-            alert("Registro exitoso!");
+            console.log("Registro exitoso, redirigiendo...");
         } catch (error) {
             alert(error.message);
         }
     });
 }
 
+// Inicio de sesión de usuario
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = loginForm['login-email'].value;
         const password = loginForm['login-password'].value;
         try {
+            // La redirección ocurrirá automáticamente gracias a onAuthStateChanged
             await signInWithEmailAndPassword(auth, email, password);
-            alert("Inicio de sesión exitoso!");
+            console.log("Inicio de sesión exitoso, redirigiendo...");
         } catch (error) {
             alert(error.message);
         }
     });
 }
 
+// Cerrar sesión
 if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
         await signOut(auth);
-        window.location.href = 'index.html';
+        console.log("Sesión cerrada, redirigiendo a index.html");
+        // onAuthStateChanged también se activará aquí y nos enviará a index.html si estamos en una página protegida
     });
 }
 
-// Lógica para alternar formularios de registro/inicio de sesión
+// Lógica para alternar formularios de registro/inicio de sesión (sin cambios)
 if (showLoginLink) {
     showLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
-        registerContainer.classList.add('hidden');
-        loginContainer.classList.remove('hidden');
+        if (registerContainer && loginContainer) {
+            registerContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+        }
     });
 }
 
 if (showRegisterLink) {
     showRegisterLink.addEventListener('click', (e) => {
         e.preventDefault();
-        loginContainer.classList.add('hidden');
-        registerContainer.classList.remove('hidden');
+        if (loginContainer && registerContainer) {
+            loginContainer.classList.add('hidden');
+            registerContainer.classList.remove('hidden');
+        }
     });
 }
+
+// ... El resto de tus funciones (loadAdminProducts, editProduct, deleteProduct, etc.) se mantienen igual.
+// Las he omitido para mantener la respuesta concisa, pero puedes copiarlas y pegarlas
+// en tu archivo sin cambios.
 
 // Lógica del panel de administración
 if (productForm) {
