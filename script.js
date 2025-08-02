@@ -1,42 +1,22 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCJ__y3irk8qr7DQMzOdX8wveTLXPNmtWw",
-  authDomain: "cd-y-dvd.firebaseapp.com",
-  databaseURL: "https://cd-y-dvd-default-rtdb.firebaseio.com",
-  projectId: "cd-y-dvd",
-  storageBucket: "cd-y-dvd.firebasestorage.app",
-  messagingSenderId: "355559044908",
-  appId: "1:355559044908:web:813472eda219925ee59e89",
-  measurementId: "G-SY6Z7CB1C5"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Importa las funciones necesarias de los SDKs
+                // Importa las funciones necesarias de los SDKs de Firebase para el navegador
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onSnapshot, query, where, getDoc } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 
-// Tu configuración de Firebase
+// Tu configuración de Firebase para el proyecto 'cd-y-dvd'
 const firebaseConfig = {
-    apiKey: "TU_API_KEY_AQUI",
-    authDomain: "TU_AUTH_DOMAIN_AQUI",
-    projectId: "TU_PROJECT_ID_AQUI",
-    storageBucket: "TU_STORAGE_BUCKET_AQUI",
-    messagingSenderId: "TU_MESSAGING_SENDER_ID_AQUI",
-    appId: "TU_APP_ID_AQUI"
+    apiKey: "AIzaSyCJ__y3irk8qr7DQMzOdX8wveTLXPNmtWw",
+    authDomain: "cd-y-dvd.firebaseapp.com",
+    databaseURL: "https://cd-y-dvd-default-rtdb.firebaseio.com",
+    projectId: "cd-y-dvd",
+    storageBucket: "cd-y-dvd.firebasestorage.app",
+    messagingSenderId: "355559044908",
+    appId: "1:355559044908:web:813472eda219925ee59e89",
+    // El measurementId es opcional si no usas Google Analytics
+    measurementId: "G-SY6Z7CB1C5"
 };
 
-// Inicializa Firebase
+// Inicializa Firebase una sola vez con la configuración de tu proyecto
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -72,7 +52,6 @@ onAuthStateChanged(auth, async (user) => {
             }
         }
         
-        // Lógica para catálogos y admin
         if (currentPath.includes('catalogo.html')) {
             loadProducts();
             loadCart();
@@ -166,7 +145,7 @@ if (productForm) {
                 alert("Producto añadido con éxito!");
             }
             productForm.reset();
-            loadAdminProducts(); // Recarga la lista de productos
+            loadAdminProducts();
         } catch (error) {
             alert("Error al guardar el producto: " + error.message);
         }
@@ -200,7 +179,6 @@ async function loadAdminProducts() {
             productList.appendChild(productElement);
         });
 
-        // Eventos para editar y eliminar
         productList.querySelectorAll('.edit-button').forEach(button => {
             button.addEventListener('click', (e) => editProduct(e.target.dataset.id));
         });
@@ -275,8 +253,6 @@ async function addToCart(productId) {
     }
     
     const cartRef = collection(db, 'carts');
-    const cartItemRef = doc(cartRef, `${user.uid}_${productId}`);
-
     const productDoc = await getDoc(doc(db, 'products', productId));
     if (!productDoc.exists()) {
         alert("Producto no encontrado.");
@@ -289,10 +265,13 @@ async function addToCart(productId) {
         return;
     }
 
-    const cartDoc = await getDoc(cartItemRef);
-    if (cartDoc.exists()) {
-        await updateDoc(cartItemRef, {
-            quantity: cartDoc.data().quantity + 1
+    const cartQuery = query(cartRef, where('userId', '==', user.uid), where('productId', '==', productId));
+    const cartSnapshot = await getDocs(cartQuery);
+
+    if (!cartSnapshot.empty) {
+        const cartItemDoc = cartSnapshot.docs[0];
+        await updateDoc(doc(db, 'carts', cartItemDoc.id), {
+            quantity: cartItemDoc.data().quantity + 1
         });
     } else {
         await addDoc(cartRef, {
@@ -366,8 +345,6 @@ async function loadCartItems() {
     if (checkoutButton) {
         checkoutButton.addEventListener('click', () => {
             alert("Compra finalizada con éxito! (Esta es una función simulada)");
-            // Aquí iría la lógica real para procesar el pago y vaciar el carrito
-            // Por ahora, solo vaciamos el carrito simuladamente
             const user = auth.currentUser;
             if (user) {
                 const cartRef = collection(db, 'carts');
@@ -382,5 +359,3 @@ async function loadCartItems() {
         });
     }
 }
-
-
