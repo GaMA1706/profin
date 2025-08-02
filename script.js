@@ -15,7 +15,7 @@ const firebaseConfig = {
     measurementId: "G-SY6Z7CB1C5"
 };
 
-// Inicializa Firebase una sola vez con la configuración de tu proyecto
+// Inicializa Firebase una sola vez
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -38,15 +38,14 @@ const cartCountElement = document.getElementById('cart-count');
 const checkoutButton = document.getElementById('checkout-button');
 
 // --- Lógica de Autenticación y Redirección ---
-// onAuthStateChanged es la mejor manera de manejar las redirecciones, ya que se activa automáticamente
-// cuando el estado de autenticación cambia (login, logout, o recarga de página con sesión activa).
+
+// onAuthStateChanged escucha los cambios de estado de autenticación (login, logout)
 onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
 
     if (user) {
         // Usuario autenticado
         if (currentPath.includes('index.html') || currentPath === '/') {
-            // Si el usuario está en la página de inicio, redirigirlo a la página correcta.
             if (user.email.endsWith('@admin.com')) {
                 window.location.href = 'admin.html';
             } else {
@@ -54,7 +53,7 @@ onAuthStateChanged(auth, (user) => {
             }
         }
         
-        // Cargar los datos específicos de cada página si el usuario está autenticado
+        // Cargar los datos de la página actual
         if (currentPath.includes('catalogo.html')) {
             loadProducts();
             loadCart();
@@ -66,14 +65,11 @@ onAuthStateChanged(auth, (user) => {
         
     } else {
         // Usuario no autenticado
-        // Si el usuario está en una página protegida (no la de inicio), lo redirige a index.html.
         if (!currentPath.includes('index.html') && currentPath !== '/') {
             window.location.href = 'index.html';
         }
     }
 });
-
-// --- Manejadores de eventos de los formularios y botones ---
 
 // Registro de usuario
 if (registerForm) {
@@ -82,9 +78,19 @@ if (registerForm) {
         const email = registerForm['register-email'].value;
         const password = registerForm['register-password'].value;
         try {
-            // La redirección ocurrirá automáticamente gracias a onAuthStateChanged
-            await createUserWithEmailAndPassword(auth, email, password);
+            // 1. Crear el usuario en Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            // 2. Guardar la información del usuario en Firestore
+            await addDoc(collection(db, 'users'), {
+                uid: user.uid,
+                email: user.email,
+                createdAt: new Date(),
+            });
+
             console.log("Registro exitoso, redirigiendo...");
+            // onAuthStateChanged se activará y hará la redirección
         } catch (error) {
             alert(error.message);
         }
@@ -98,9 +104,9 @@ if (loginForm) {
         const email = loginForm['login-email'].value;
         const password = loginForm['login-password'].value;
         try {
-            // La redirección ocurrirá automáticamente gracias a onAuthStateChanged
             await signInWithEmailAndPassword(auth, email, password);
             console.log("Inicio de sesión exitoso, redirigiendo...");
+            // onAuthStateChanged se activará y hará la redirección
         } catch (error) {
             alert(error.message);
         }
@@ -112,11 +118,10 @@ if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
         await signOut(auth);
         console.log("Sesión cerrada, redirigiendo a index.html");
-        // onAuthStateChanged también se activará aquí y nos enviará a index.html si estamos en una página protegida
     });
 }
 
-// Lógica para alternar formularios de registro/inicio de sesión (sin cambios)
+// Lógica para alternar formularios de registro/inicio de sesión
 if (showLoginLink) {
     showLoginLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -137,11 +142,8 @@ if (showRegisterLink) {
     });
 }
 
-// ... El resto de tus funciones (loadAdminProducts, editProduct, deleteProduct, etc.) se mantienen igual.
-// Las he omitido para mantener la respuesta concisa, pero puedes copiarlas y pegarlas
-// en tu archivo sin cambios.
+// --- Lógica del panel de administración y catálogo (sin cambios) ---
 
-// Lógica del panel de administración
 if (productForm) {
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -178,7 +180,7 @@ async function loadAdminProducts() {
     const productsRef = collection(db, 'products');
     const q = query(productsRef);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    onSnapshot(q, (snapshot) => {
         productList.innerHTML = '';
         snapshot.forEach((doc) => {
             const product = { ...doc.data(), id: doc.id };
@@ -237,7 +239,7 @@ async function loadProducts() {
     const productsRef = collection(db, 'products');
     const q = query(productsRef, where('stock', '>', 0));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    onSnapshot(q, (snapshot) => {
         productCatalogue.innerHTML = '';
         snapshot.forEach((doc) => {
             const product = { ...doc.data(), id: doc.id };
