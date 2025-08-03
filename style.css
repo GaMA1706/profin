@@ -17,6 +17,14 @@ body {
     animation: flicker 1.5s infinite alternate;
 }
 
+body {
+    background-image: url('64945b863c28f.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
 @keyframes flicker {
     0%, 100% {
         text-shadow:
@@ -63,3 +71,4 @@ button {
     height: 300px; /* Ajusta la altura de las imágenes de las portadas */
     object-fit: cover;
 }
+
